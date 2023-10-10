@@ -15,20 +15,28 @@ public class Main {
                     client.getInetAddress());
             InputStream is = client.getInputStream();
             BufferedReader p_IN = new BufferedReader(new InputStreamReader(is));
+
+            OutputStream os = client.getOutputStream();
+            PrintWriter p_OUT = new PrintWriter(os, true);
+
             String line;
             StringBuilder content = new StringBuilder();
-            content.append("Client:   ");
-            while ((line = p_IN.readLine()) != null) {
-                if (line.contains("**TERM**")) {
-                    is.close();
-                    client.close();
-                    return;
+
+            while(true) {
+                while ((line = p_IN.readLine()) != null) {
+                    if (line.contains("**TERM**")) {
+                        is.close();
+                        client.close();
+                        return;
+                    }
+                    content.append(line);
+                    content.append(System.lineSeparator());
+                    System.out.println("Client: " + content);
+                    p_OUT.println("Server Loopback:" + content);
+                    content.setLength(0);
                 }
-                content.append(line);
-                content.append(System.lineSeparator());
+
             }
-            System.out.println(content);
-            content.setLength(0);
 
 
         } catch (IOException e) {
